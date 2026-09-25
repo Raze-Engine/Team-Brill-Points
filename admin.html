@@ -40,7 +40,9 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-1.5">
                         <label for="personName" class="text-xs font-medium text-slate-600">Agent Name</label>
-                        <input type="text" id="personName" placeholder="e.g. John Doe" required class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600">
+                        <select id="personName" required class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600">
+                            <option value="">-- Select Constant Agent Name --</option>
+                        </select>
                     </div>
                     <div class="flex flex-col gap-1.5">
                         <label for="adminDate" class="text-xs font-medium text-slate-600">Entry Date</label>
@@ -113,11 +115,31 @@
     <footer class="text-center py-4 text-[11px] text-slate-400">Admin Portal &bull; Supabase Backend Connected</footer>
 
     <script>
-        // HARDCODED CONSTANT SUPABASE CREDENTIALS
         const SUPABASE_URL = "https://icdnpfimwalhkucrjlpn.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljZG5wZmltd2FsaGt1Y3JqbHBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMDUzMTIsImV4cCI6MjEwNTg4MTMxMn0.U0L28m4L8KOLCVa2KC8CqjSc0iN0lOrqwmwvVntDruQ";
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Constant Agent List from image
+        const CONSTANT_AGENTS = [
+            "Calibayan, Jeneth",
+            "Pantinople, Mary grace",
+            "Hala, Jeraden",
+            "Ponte, Kim vincent",
+            "Beldia, Jerwin",
+            "Asunto, Brillian ceasar",
+            "Maynagcot, May ann",
+            "Cenabre, Jacque lou"
+        ];
+
+        // Populate Admin Form Dropdown
+        const adminSelect = document.getElementById('personName');
+        CONSTANT_AGENTS.forEach(agent => {
+            const opt = document.createElement('option');
+            opt.value = agent;
+            opt.textContent = agent;
+            adminSelect.appendChild(opt);
+        });
 
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('adminDate').value = todayStr;
@@ -125,15 +147,15 @@
 
         async function fetchAdminData() {
             const { data: perfData } = await supabaseClient.from('performance_logs').select('*').order('created_at', { ascending: false });
-            if (perfData) renderAdminTable(perfData);
+            renderAdminTable(perfData || []);
 
             const { data: redData } = await supabaseClient.from('redemption_requests').select('*').order('created_at', { ascending: false });
-            if (redData) renderRedemptions(redData);
+            renderRedemptions(redData || []);
         }
 
         async function handleAdminSubmit(e) {
             e.preventDefault();
-            const person_name = document.getElementById('personName').value.trim();
+            const person_name = document.getElementById('personName').value;
             const entry_date = document.getElementById('adminDate').value;
             const xm = parseFloat(document.getElementById('inputXM').value) || 0;
             const gsr = parseFloat(document.getElementById('inputGSR').value) || 0;
