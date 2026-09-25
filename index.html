@@ -3,69 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Performance & Rewards Hub (Pure GitHub Backend)</title>
-    <!-- Mobile PWA Meta Tags -->
+    <title>Performance & Rewards Hub - Leaderboard</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#7e22ce">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f3f4f6;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; }
     </style>
 </head>
 <body class="text-slate-900 min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
     <div class="max-w-4xl w-full mx-auto px-4 py-8 flex flex-col gap-6">
         
-        <!-- Header & View Navigation Switcher -->
+        <!-- Header -->
         <header class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <div>
                 <h1 class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-code-commit text-purple-600"></i> GitHub-Powered Hub
+                    <i class="fa-solid fa-star text-purple-600"></i> Performance & Rewards Hub
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">Serverless metrics tracker backed directly by a GitHub repo json file</p>
+                <p class="text-xs text-slate-500 mt-0.5">Agent Leaderboard & Monthly Store</p>
             </div>
-            
-            <!-- Navigation Tabs -->
-            <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 flex-wrap gap-1">
-                <button onclick="switchView('client')" id="btnClient" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-purple-700 text-white shadow-sm">
+            <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1">
+                <button onclick="switchTab('leaderboard')" id="btnLeaderboard" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-purple-700 text-white shadow-sm">
                     <i class="fa-solid fa-trophy mr-1.5"></i> Leaderboard
                 </button>
-                <button onclick="switchView('store')" id="btnStore" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all">
+                <button onclick="switchTab('store')" id="btnStore" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all">
                     <i class="fa-solid fa-gift mr-1.5"></i> Rewards Store
                 </button>
-                <button onclick="switchView('admin')" id="btnAdmin" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all">
-                    <i class="fa-solid fa-lock mr-1.5"></i> Admin Panel
-                </button>
+                <a href="admin.html" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-purple-700 transition-all flex items-center">
+                    <i class="fa-solid fa-lock mr-1.5"></i> Admin Portal
+                </a>
             </div>
         </header>
 
-        <!-- GITHUB REPOSITORY CONFIGURATION BANNER -->
-        <div id="configBanner" class="bg-purple-900 text-white p-5 rounded-2xl shadow-lg flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <h3 class="text-sm font-bold flex items-center gap-2"><i class="fa-brands fa-github text-purple-300"></i> Connect GitHub Repository Backend</h3>
-            </div>
-            <p class="text-xs text-purple-200">Enter your GitHub repository details and Personal Access Token so the app can read/write data to your `db.json` file.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <input type="text" id="ghRepoInput" placeholder="username/repository-name (e.g. johndoe/perf-hub)" class="bg-purple-950/80 border border-purple-700/50 rounded-xl px-3 py-2 text-xs text-white placeholder-purple-400 focus:outline-none focus:border-purple-400">
-                <input type="password" id="ghTokenInput" placeholder="GitHub Personal Access Token (ghp_...)" class="bg-purple-950/80 border border-purple-700/50 rounded-xl px-3 py-2 text-xs text-white placeholder-purple-400 focus:outline-none focus:border-purple-400">
-            </div>
-            <button onclick="saveGitHubConfig()" class="self-end bg-white text-purple-900 font-bold px-4 py-2 rounded-xl text-xs hover:bg-purple-100 transition-all shadow">
-                Save & Link GitHub Storage
-            </button>
-        </div>
-
-        <!-- ================= 1. CLIENT LEADERBOARD VIEW ================= -->
-        <div id="clientView" class="flex flex-col gap-6">
-            <!-- Formula Breakdown Info Card -->
+        <!-- TAB 1: LEADERBOARD -->
+        <div id="leaderboardTab" class="flex flex-col gap-6">
             <div class="bg-gradient-to-br from-indigo-800 via-purple-700 to-indigo-900 text-white p-6 rounded-2xl shadow-xl flex flex-col gap-3">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-semibold tracking-wider uppercase text-purple-200">Scoring Formula Matrix</span>
@@ -76,12 +53,11 @@
                 </div>
             </div>
 
-            <!-- Leaderboard Table Section -->
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col gap-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Team Leaderboard & Monthly Points</h3>
-                    <button onclick="loadDatabase()" class="text-xs text-purple-700 hover:text-purple-900 font-semibold flex items-center gap-1">
-                        <i class="fa-solid fa-rotate"></i> Sync GitHub Repo
+                    <button onclick="fetchAllData()" class="text-xs text-purple-700 hover:text-purple-900 font-semibold flex items-center gap-1">
+                        <i class="fa-solid fa-rotate"></i> Refresh
                     </button>
                 </div>
                 <div class="overflow-x-auto">
@@ -95,23 +71,19 @@
                                 <th class="pb-3 text-right pr-2 font-bold text-purple-700">Calculated Score / Points</th>
                             </tr>
                         </thead>
-                        <tbody id="leaderboardTableBody" class="divide-y divide-slate-100">
-                            <!-- Injected by JS -->
-                        </tbody>
+                        <tbody id="leaderboardTableBody" class="divide-y divide-slate-100"></tbody>
                     </table>
-                    <div id="clientEmptyState" class="text-center py-10 text-slate-400 text-xs hidden">
-                        No performance records found in repository storage.
-                    </div>
+                    <div id="clientEmptyState" class="text-center py-10 text-slate-400 text-xs hidden">No performance records found yet.</div>
                 </div>
             </div>
         </div>
 
-        <!-- ================= 2. REWARDS STORE & REDEMPTION VIEW ================= -->
-        <div id="storeView" class="flex flex-col gap-6 hidden">
+        <!-- TAB 2: REWARDS STORE -->
+        <div id="storeTab" class="flex flex-col gap-6 hidden">
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                     <h2 class="text-sm font-bold text-slate-800">Monthly Redemption Store</h2>
-                    <p class="text-xs text-slate-500">Select your profile name to view available points and redeem rewards.</p>
+                    <p class="text-xs text-slate-500">Select your name to check points and request redemptions.</p>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <select id="storeUserSelect" onchange="updateStoreBalance()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-purple-600">
@@ -124,7 +96,6 @@
                 </div>
             </div>
 
-            <!-- Rewards Catalog Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between gap-4">
                     <div class="flex flex-col gap-1">
@@ -161,7 +132,6 @@
                 </div>
             </div>
 
-            <!-- Redemption Requests History -->
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col gap-4">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Redemption History & Status</h3>
                 <div class="overflow-x-auto">
@@ -182,154 +152,37 @@
             </div>
         </div>
 
-        <!-- ================= 3. ADMIN PANEL VIEW ================= -->
-        <div id="adminView" class="flex flex-col gap-6 hidden">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xl shadow-slate-200/50 flex flex-col gap-6">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                    <h2 class="text-sm font-semibold tracking-wide text-slate-700 uppercase">Input / Update Agent Daily Metrics</h2>
-                    <span id="currentDateDisplay" class="text-xs text-slate-500 font-medium"></span>
-                </div>
-
-                <form id="adminForm" onsubmit="handleAdminSubmit(event)" class="flex flex-col gap-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-1.5">
-                            <label for="personName" class="text-xs font-medium text-slate-600">Agent Name</label>
-                            <input type="text" id="personName" placeholder="e.g. John Doe" required class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600">
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label for="adminDate" class="text-xs font-medium text-slate-600">Entry Date</label>
-                            <input type="date" id="adminDate" required class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="flex flex-col gap-1.5">
-                            <label for="inputXM" class="text-xs font-medium text-slate-600">XM Count</label>
-                            <input type="number" step="any" id="inputXM" placeholder="e.g. 2" required min="0" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600">
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label for="inputGSR" class="text-xs font-medium text-slate-600">GSR Count</label>
-                            <input type="number" step="any" id="inputGSR" placeholder="e.g. 3" required min="0" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600">
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label for="inputAHT" class="text-xs font-medium text-slate-600">AHT (Seconds)</label>
-                            <input type="number" step="any" id="inputAHT" placeholder="e.g. 900" required min="1" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600">
-                        </div>
-                    </div>
-                    <button type="submit" class="mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-code-commit"></i> Commit Entry to GitHub JSON Storage
-                    </button>
-                </form>
-            </div>
-
-            <!-- Admin Approvals -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col gap-4">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Manage Reward Redemptions</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-slate-700">
-                        <thead class="text-slate-400 uppercase font-semibold border-b border-slate-100">
-                            <tr>
-                                <th class="pb-2">Agent</th>
-                                <th class="pb-2">Reward Item</th>
-                                <th class="pb-2 text-center">Cost</th>
-                                <th class="pb-2 text-center">Status</th>
-                                <th class="pb-2 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminRedemptionTableBody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Admin Raw Logs Table -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col gap-4">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">All Daily Metric Logs</h3>
-                <div class="overflow-x-auto max-h-48 overflow-y-auto pr-1">
-                    <table class="w-full text-left text-xs text-slate-700">
-                        <thead class="text-slate-400 uppercase font-semibold border-b border-slate-100 sticky top-0 bg-white">
-                            <tr>
-                                <th class="pb-2">Date</th>
-                                <th class="pb-2">Agent</th>
-                                <th class="pb-2 text-center">XM</th>
-                                <th class="pb-2 text-center">GSR</th>
-                                <th class="pb-2 text-center">AHT</th>
-                                <th class="pb-2 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminTableBody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <footer class="text-center py-4 text-[11px] text-slate-400">
-        Pure GitHub Backend Storage &bull; JSON API Sync Active
-    </footer>
+    <footer class="text-center py-4 text-[11px] text-slate-400">Client Portal &bull; Supabase Backend Connected</footer>
 
-    <!-- App Logic Script -->
     <script>
-        let dbFileSha = null;
-        let dbContent = { performance_logs: [], redemption_requests: [] };
+        // HARDCODED CONSTANT SUPABASE CREDENTIALS
+        const SUPABASE_URL = "YOUR_SUPABASE_URL";
+        const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let agentPointsMap = {};
 
-        let ghRepo = localStorage.getItem('gh_repo') || '';
-        let ghToken = localStorage.getItem('gh_token') || '';
+        function switchTab(tab) {
+            const lbTab = document.getElementById('leaderboardTab');
+            const stTab = document.getElementById('storeTab');
+            const btnLb = document.getElementById('btnLeaderboard');
+            const btnSt = document.getElementById('btnStore');
 
-        if (ghRepo && ghToken) {
-            document.getElementById('ghRepoInput').value = ghRepo;
-            document.getElementById('ghTokenInput').value = ghToken;
-            loadDatabase();
-        }
+            lbTab.classList.add('hidden');
+            stTab.classList.add('hidden');
+            btnLb.className = btnSt.className = 'px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all';
 
-        function saveGitHubConfig() {
-            ghRepo = document.getElementById('ghRepoInput').value.trim();
-            ghToken = document.getElementById('ghTokenInput').value.trim();
-
-            if (!ghRepo || !ghToken) {
-                alert('Please provide both repository and personal access token.');
-                return;
-            }
-
-            localStorage.setItem('gh_repo', ghRepo);
-            localStorage.setItem('gh_token', ghToken);
-            loadDatabase();
-        }
-
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('adminDate').value = todayStr;
-        document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-        function switchView(view) {
-            const clientView = document.getElementById('clientView');
-            const storeView = document.getElementById('storeView');
-            const adminView = document.getElementById('adminView');
-            
-            const btnClient = document.getElementById('btnClient');
-            const btnStore = document.getElementById('btnStore');
-            const btnAdmin = document.getElementById('btnAdmin');
-
-            clientView.classList.add('hidden');
-            storeView.classList.add('hidden');
-            adminView.classList.add('hidden');
-            btnClient.className = btnStore.className = btnAdmin.className = 'px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all';
-
-            if (view === 'client') {
-                clientView.classList.remove('hidden');
-                btnClient.className = 'px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-purple-700 text-white shadow-sm';
-            } else if (view === 'store') {
-                storeView.classList.remove('hidden');
-                btnStore.className = 'px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-purple-700 text-white shadow-sm';
+            if (tab === 'leaderboard') {
+                lbTab.classList.remove('hidden');
+                btnLb.className = 'px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-purple-700 text-white shadow-sm';
+            } else if (tab === 'store') {
+                stTab.classList.remove('hidden');
+                btnSt.className = 'px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-purple-700 text-white shadow-sm';
                 populateUserDropdown();
-            } else if (view === 'admin') {
-                if (!ghToken) {
-                    alert('Please configure your GitHub settings first.');
-                    return;
-                }
-                adminView.classList.remove('hidden');
-                btnAdmin.className = 'px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-purple-700 text-white shadow-sm';
             }
-            loadDatabase();
+            fetchAllData();
         }
 
         function calculateScore(xm, gsr, aht) {
@@ -338,190 +191,57 @@
             return Math.round(score * 100) / 100;
         }
 
-        // GitHub API File Communication Layer
-        async function loadDatabase() {
-            if (!ghRepo || !ghToken) {
-                document.getElementById('configBanner').classList.remove('hidden');
-                return;
-            }
+        async function fetchAllData() {
+            const { data: perfData } = await supabaseClient.from('performance_logs').select('*').order('created_at', { ascending: false });
+            if (perfData) renderLeaderboard(perfData);
 
-            try {
-                const res = await fetch(`https://api.github.com/repos/${ghRepo}/contents/db.json`, {
-                    headers: { 'Authorization': `token ${ghToken}`, 'Accept': 'application/vnd.github+json' }
-                });
-
-                if (res.status === 404) {
-                    // Initialize empty db.json if it doesn't exist yet
-                    dbContent = { performance_logs: [], redemption_requests: [] };
-                    dbFileSha = null;
-                    await commitDatabase("Initialize empty db.json");
-                    document.getElementById('configBanner').classList.add('hidden');
-                    return;
-                }
-
-                if (!res.ok) throw new Error('Failed to fetch db.json from GitHub repo.');
-
-                const data = await res.json();
-                dbFileSha = data.sha;
-                // Decode base64 content
-                const decodedJson = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                dbContent = decodedJson;
-
-                document.getElementById('configBanner').classList.add('hidden');
-                renderLeaderboard(dbContent.performance_logs || []);
-                renderAdminTable(dbContent.performance_logs || []);
-                renderRedemptions(dbContent.redemption_requests || []);
-            } catch (err) {
-                alert('GitHub Connection Error: ' + err.message);
-            }
-        }
-
-        async function commitDatabase(commitMessage) {
-            try {
-                const jsonString = JSON.stringify(dbContent, null, 2);
-                const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
-
-                const bodyData = {
-                    message: commitMessage,
-                    content: base64Content
-                };
-                if (dbFileSha) {
-                    bodyData.sha = dbFileSha;
-                }
-
-                const res = await fetch(`https://api.github.com/repos/${ghRepo}/contents/db.json`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${ghToken}`,
-                        'Accept': 'application/vnd.github+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(bodyData)
-                });
-
-                if (!res.ok) {
-                    const errJson = await res.json();
-                    throw new Error(errJson.message || 'Commit failed');
-                }
-
-                const resData = await res.json();
-                dbFileSha = resData.content.sha;
-            } catch (err) {
-                alert('Failed to save data to GitHub: ' + err.message);
-            }
-        }
-
-        async function handleAdminSubmit(e) {
-            e.preventDefault();
-            if (!ghToken) return;
-
-            const newRecord = {
-                id: 'perf_' + Date.now() + Math.random().toString(36.substring(2, 7)),
-                created_at: new Date().toISOString(),
-                person_name: document.getElementById('personName').value.trim(),
-                entry_date: document.getElementById('adminDate').value,
-                xm: parseFloat(document.getElementById('inputXM').value) || 0,
-                gsr: parseFloat(document.getElementById('inputGSR').value) || 0,
-                aht: parseFloat(document.getElementById('inputAHT').value) || 900
-            };
-
-            dbContent.performance_logs.unshift(newRecord);
-            await commitDatabase(`Add performance metric for ${newRecord.person_name}`);
-
-            document.getElementById('inputXM').value = '';
-            document.getElementById('inputGSR').value = '';
-            document.getElementById('inputAHT').value = '';
-
-            loadDatabase();
-            alert('Daily metrics saved and committed to GitHub successfully!');
-        }
-
-        async function deletePerformanceRecord(id) {
-            if (!confirm('Delete this record?')) return;
-            dbContent.performance_logs = dbContent.performance_logs.filter(r => r.id !== id);
-            await commitDatabase("Delete performance record");
-            loadDatabase();
+            const { data: redData } = await supabaseClient.from('redemption_requests').select('*').order('created_at', { ascending: false });
+            if (redData) renderRedemptions(redData);
         }
 
         function populateUserDropdown() {
             const select = document.getElementById('storeUserSelect');
+            const currentVal = select.value;
             select.innerHTML = '<option value="">-- Select Your Name --</option>';
-            
             Object.keys(agentPointsMap).forEach(agent => {
                 const opt = document.createElement('option');
                 opt.value = agent;
                 opt.textContent = agent;
                 select.appendChild(opt);
             });
+            select.value = currentVal;
         }
 
         function updateStoreBalance() {
             const agent = document.getElementById('storeUserSelect').value;
             const pointsEl = document.getElementById('userAvailablePoints');
-            if (!agent) {
-                pointsEl.textContent = '0 Pts';
-                return;
-            }
+            if (!agent) { pointsEl.textContent = '0 Pts'; return; }
             const pts = agentPointsMap[agent] || 0;
             pointsEl.textContent = pts.toLocaleString() + ' Pts';
         }
 
         async function requestRedemption(itemTitle, cost) {
             const agent = document.getElementById('storeUserSelect').value;
-            if (!agent) {
-                alert('Please select your agent name from the dropdown first.');
-                return;
-            }
-
+            if (!agent) { alert('Please select your agent name first.'); return; }
             const availablePts = agentPointsMap[agent] || 0;
-            if (availablePts < cost) {
-                alert(`Insufficient points! You have ${availablePts} Pts, but this item requires ${cost} Pts.`);
-                return;
-            }
+            if (availablePts < cost) { alert(`Insufficient points! You have ${availablePts} Pts, but this item requires ${cost} Pts.`); return; }
 
-            const newRedemption = {
-                id: 'red_' + Date.now(),
-                created_at: new Date().toISOString(),
-                person_name: agent,
-                reward_item: itemTitle,
-                points_cost: cost,
-                status: 'Pending'
-            };
-
-            if (!dbContent.redemption_requests) dbContent.redemption_requests = [];
-            dbContent.redemption_requests.unshift(newRedemption);
-
-            await commitDatabase(`Request reward redemption: ${itemTitle} for ${agent}`);
-            alert('Redemption request committed successfully!');
-            loadDatabase();
-        }
-
-        async function updateRedemptionStatus(id, newStatus) {
-            const item = dbContent.redemption_requests.find(r => r.id === id);
-            if (item) {
-                item.status = newStatus;
-                await commitDatabase(`Update redemption status to ${newStatus}`);
-                loadDatabase();
-            }
+            const { error } = await supabaseClient.from('redemption_requests').insert([{ person_name: agent, reward_item: itemTitle, points_cost: cost, status: 'Pending' }]);
+            if (error) { alert('Redemption failed: ' + error.message); return; }
+            alert('Redemption request submitted successfully!');
+            fetchAllData();
         }
 
         function renderLeaderboard(records) {
             const tbody = document.getElementById('leaderboardTableBody');
             const emptyState = document.getElementById('clientEmptyState');
             tbody.innerHTML = '';
-
-            if (!records || records.length === 0) {
-                emptyState.classList.remove('hidden');
-                agentPointsMap = {};
-                return;
-            }
+            if (!records || records.length === 0) { emptyState.classList.remove('hidden'); agentPointsMap = {}; return; }
             emptyState.classList.add('hidden');
 
             const aggregated = {};
             records.forEach(r => {
-                if (!aggregated[r.person_name]) {
-                    aggregated[r.person_name] = { xm: 0, gsr: 0, ahtSum: 0, count: 0 };
-                }
+                if (!aggregated[r.person_name]) aggregated[r.person_name] = { xm: 0, gsr: 0, ahtSum: 0, count: 0 };
                 aggregated[r.person_name].xm += Number(r.xm);
                 aggregated[r.person_name].gsr += Number(r.gsr);
                 aggregated[r.person_name].ahtSum += Number(r.aht);
@@ -542,7 +262,6 @@
             list.forEach((agent, index) => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition-colors';
-                
                 let rankBadge = `<span class="w-6 h-6 inline-flex items-center justify-center rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 mr-2">${index + 1}</span>`;
                 if (index === 0) rankBadge = `<span class="w-6 h-6 inline-flex items-center justify-center rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 mr-2"><i class="fa-solid fa-crown"></i></span>`;
 
@@ -555,26 +274,19 @@
                 `;
                 tbody.appendChild(tr);
             });
+            populateUserDropdown();
             updateStoreBalance();
         }
 
         function renderRedemptions(redData) {
             const tbodyClient = document.getElementById('redemptionTableBody');
-            const tbodyAdmin = document.getElementById('adminRedemptionTableBody');
             const emptyClient = document.getElementById('redemptionEmptyState');
-            
             tbodyClient.innerHTML = '';
-            tbodyAdmin.innerHTML = '';
-
-            if (!redData || redData.length === 0) {
-                emptyClient.classList.remove('hidden');
-                return;
-            }
+            if (!redData || redData.length === 0) { emptyClient.classList.remove('hidden'); return; }
             emptyClient.classList.add('hidden');
 
             redData.forEach(item => {
                 const dateStr = new Date(item.created_at).toLocaleDateString();
-                
                 const trC = document.createElement('tr');
                 trC.className = 'hover:bg-slate-50';
                 trC.innerHTML = `
@@ -585,46 +297,10 @@
                     <td class="py-2.5 text-right font-bold ${item.status === 'Approved' ? 'text-green-600' : item.status === 'Fulfilled' ? 'text-indigo-600' : 'text-amber-600'}">${item.status}</td>
                 `;
                 tbodyClient.appendChild(trC);
-
-                const trA = document.createElement('tr');
-                trA.className = 'hover:bg-slate-50';
-                trA.innerHTML = `
-                    <td class="py-2.5 font-medium text-slate-800">${item.person_name}</td>
-                    <td class="py-2.5 text-slate-700">${item.reward_item}</td>
-                    <td class="py-2.5 text-center font-semibold">${item.points_cost} Pts</td>
-                    <td class="py-2.5 text-center font-bold ${item.status === 'Approved' ? 'text-green-600' : 'text-amber-600'}">${item.status}</td>
-                    <td class="py-2.5 text-right space-x-1">
-                        <button onclick="updateRedemptionStatus('${item.id}', 'Approved')" class="px-2 py-1 bg-green-100 text-green-700 rounded text-[10px] font-bold hover:bg-green-200">Approve</button>
-                        <button onclick="updateRedemptionStatus('${item.id}', 'Fulfilled')" class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-[10px] font-bold hover:bg-indigo-200">Fulfill</button>
-                    </td>
-                `;
-                tbodyAdmin.appendChild(trA);
             });
         }
 
-        function renderAdminTable(records) {
-            const tbody = document.getElementById('adminTableBody');
-            tbody.innerHTML = '';
-            records.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50';
-                tr.innerHTML = `
-                    <td class="py-2 text-slate-600">${item.entry_date}</td>
-                    <td class="py-2 font-semibold text-slate-800">${item.person_name}</td>
-                    <td class="py-2 text-center">${item.xm}</td>
-                    <td class="py-2 text-center">${item.gsr}</td>
-                    <td class="py-2 text-center">${item.aht}s</td>
-                    <td class="py-2 text-right">
-                        <button onclick="deletePerformanceRecord('${item.id}')" class="text-slate-400 hover:text-red-500 px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        if (ghRepo && ghToken) {
-            loadDatabase();
-        }
+        fetchAllData();
     </script>
 </body>
 </html>
