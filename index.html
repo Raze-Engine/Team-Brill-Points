@@ -20,13 +20,13 @@
 
     <div class="max-w-4xl w-full mx-auto px-4 py-8 flex flex-col gap-6">
         
-        <!-- Header (Admin link removed completely) -->
+        <!-- Header -->
         <header class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <div>
                 <h1 class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-star text-purple-600"></i> Performance & Rewards Hub
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">Agent Leaderboard & Monthly Store</p>
+                <p class="text-xs text-slate-500 mt-0.5">Agent Leaderboard & Rewards (10 Pts = ₱1 | 30-Day Lock Rule)</p>
             </div>
             <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1">
                 <button onclick="switchTab('leaderboard')" id="btnLeaderboard" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-purple-700 text-white shadow-sm">
@@ -79,16 +79,25 @@
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                     <h2 class="text-sm font-bold text-slate-800">Monthly Redemption Store</h2>
-                    <p class="text-xs text-slate-500">Select your name to check points and request redemptions.</p>
+                    <p class="text-xs text-slate-500">Select your name to check points and redeem rewards after 30 days of tracking.</p>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <select id="storeUserSelect" onchange="updateStoreBalance()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-purple-600">
                         <option value="">-- Select Your Name --</option>
                     </select>
                     <div class="bg-purple-50 border border-purple-200 px-4 py-2 rounded-xl text-right">
-                        <span class="block text-[10px] uppercase font-bold text-purple-600">Available Points</span>
-                        <span id="userAvailablePoints" class="text-base font-extrabold text-purple-900">0 Pts</span>
+                        <span class="block text-[10px] uppercase font-bold text-purple-600">Available Balance</span>
+                        <span id="userAvailablePoints" class="text-base font-extrabold text-purple-900">0 Pts (₱0.00)</span>
                     </div>
+                </div>
+            </div>
+
+            <!-- 30-Day Status Banner -->
+            <div id="lockoutBanner" class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-800 flex items-center gap-3 hidden">
+                <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg"></i>
+                <div>
+                    <span class="font-bold block" id="lockoutTitle">Redemption locked</span>
+                    <span id="lockoutMessage">Rewards can only be claimed after 30 days from your initial tracking start date.</span>
                 </div>
             </div>
 
@@ -100,8 +109,11 @@
                         <p class="text-xs text-slate-500">Enjoy a relaxing half-day off fully paid.</p>
                     </div>
                     <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <span class="text-xs font-extrabold text-purple-700">1,500 Pts</span>
-                        <button onclick="requestRedemption('Paid Half-Day Off', 1500)" class="bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm">Redeem</button>
+                        <div>
+                            <span class="block text-xs font-extrabold text-purple-700">1,500 Pts</span>
+                            <span class="text-[10px] font-bold text-slate-400">₱150.00 value</span>
+                        </div>
+                        <button id="btnRedeem1" onclick="requestRedemption('Paid Half-Day Off', 1500)" class="bg-purple-700 hover:bg-purple-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm">Redeem</button>
                     </div>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between gap-4">
@@ -111,8 +123,11 @@
                         <p class="text-xs text-slate-500">Digital e-gift card of your choice.</p>
                     </div>
                     <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <span class="text-xs font-extrabold text-purple-700">2,500 Pts</span>
-                        <button onclick="requestRedemption('$50 Gift Card', 2500)" class="bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm">Redeem</button>
+                        <div>
+                            <span class="block text-xs font-extrabold text-purple-700">2,500 Pts</span>
+                            <span class="text-[10px] font-bold text-slate-400">₱250.00 value</span>
+                        </div>
+                        <button id="btnRedeem2" onclick="requestRedemption('$50 Gift Card', 2500)" class="bg-purple-700 hover:bg-purple-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm">Redeem</button>
                     </div>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between gap-4">
@@ -122,8 +137,11 @@
                         <p class="text-xs text-slate-500">Food delivery voucher for your shift.</p>
                     </div>
                     <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <span class="text-xs font-extrabold text-purple-700">800 Pts</span>
-                        <button onclick="requestRedemption('Team Lunch Treat', 800)" class="bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm">Redeem</button>
+                        <div>
+                            <span class="block text-xs font-extrabold text-purple-700">800 Pts</span>
+                            <span class="text-[10px] font-bold text-slate-400">₱80.00 value</span>
+                        </div>
+                        <button id="btnRedeem3" onclick="requestRedemption('Team Lunch Treat', 800)" class="bg-purple-700 hover:bg-purple-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm">Redeem</button>
                     </div>
                 </div>
             </div>
@@ -158,7 +176,6 @@
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // Constant Agent List from image
         const CONSTANT_AGENTS = [
             "Calibayan, Jeneth",
             "Pantinople, Mary grace",
@@ -170,6 +187,7 @@
             "Cenabre, Jacque lou"
         ];
         let agentPointsMap = {};
+        let agentFirstLogMap = {}; // Tracks the earliest date an agent has an entry
 
         function switchTab(tab) {
             const lbTab = document.getElementById('leaderboardTab');
@@ -199,7 +217,7 @@
         }
 
         async function fetchAllData() {
-            const { data: perfData } = await supabaseClient.from('performance_logs').select('*').order('created_at', { ascending: false });
+            const { data: perfData } = await supabaseClient.from('performance_logs').select('*').order('created_at', { ascending: true });
             renderLeaderboard(perfData || []);
 
             const { data: redData } = await supabaseClient.from('redemption_requests').select('*').order('created_at', { ascending: false });
@@ -222,14 +240,58 @@
         function updateStoreBalance() {
             const agent = document.getElementById('storeUserSelect').value;
             const pointsEl = document.getElementById('userAvailablePoints');
-            if (!agent) { pointsEl.textContent = '0 Pts'; return; }
+            const lockoutBanner = document.getElementById('lockoutBanner');
+            const lockoutMessage = document.getElementById('lockoutMessage');
+            const btn1 = document.getElementById('btnRedeem1');
+            const btn2 = document.getElementById('btnRedeem2');
+            const btn3 = document.getElementById('btnRedeem3');
+
+            if (!agent) { 
+                pointsEl.textContent = '0 Pts (₱0.00)'; 
+                lockoutBanner.classList.add('hidden');
+                setButtonsEnabled(false);
+                return; 
+            }
+
             const pts = agentPointsMap[agent] || 0;
-            pointsEl.textContent = pts.toLocaleString() + ' Pts';
+            const pesos = pts / 10;
+            pointsEl.textContent = `${pts.toLocaleString()} Pts (₱${pesos.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})})`;
+
+            // Check 30-day rule based on agent's first performance log date
+            const firstLogDateStr = agentFirstLogMap[agent];
+            if (!firstLogDateStr) {
+                lockoutBanner.classList.remove('hidden');
+                lockoutMessage.textContent = 'No performance logs found yet. You must have at least 30 days of tracking history before claiming rewards.';
+                setButtonsEnabled(false);
+                return;
+            }
+
+            const firstDate = new Date(firstLogDateStr);
+            const today = new Date();
+            const diffTime = today - firstDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 30) {
+                const daysRemaining = 30 - diffDays;
+                lockoutBanner.classList.remove('hidden');
+                lockoutMessage.textContent = `Redemptions unlock after 30 days of tracking. You are currently on day ${diffDays} (approx. ${daysRemaining} day(s) remaining).`;
+                setButtonsEnabled(false);
+            } else {
+                lockoutBanner.classList.add('hidden');
+                setButtonsEnabled(true);
+            }
+        }
+
+        function setButtonsEnabled(enabled) {
+            ['btnRedeem1', 'btnRedeem2', 'btnRedeem3'].forEach(id => {
+                document.getElementById(id).disabled = !enabled;
+            });
         }
 
         async function requestRedemption(itemTitle, cost) {
             const agent = document.getElementById('storeUserSelect').value;
             if (!agent) { alert('Please select your agent name first.'); return; }
+            
             const availablePts = agentPointsMap[agent] || 0;
             if (availablePts < cost) { alert(`Insufficient points! You have ${availablePts} Pts, but this item requires ${cost} Pts.`); return; }
 
@@ -243,19 +305,24 @@
             const tbody = document.getElementById('leaderboardTableBody');
             tbody.innerHTML = '';
 
-            // Initialize all constant agents with 0 scores
             const aggregated = {};
+            agentFirstLogMap = {};
+
             CONSTANT_AGENTS.forEach(name => {
                 aggregated[name] = { xm: 0, gsr: 0, ahtSum: 0, count: 0 };
             });
 
-            // Aggregate incoming records if they match constant names
             records.forEach(r => {
                 if (aggregated[r.person_name]) {
                     aggregated[r.person_name].xm += Number(r.xm);
                     aggregated[r.person_name].gsr += Number(r.gsr);
                     aggregated[r.person_name].ahtSum += Number(r.aht);
                     aggregated[r.person_name].count += 1;
+
+                    // Track earliest entry date per agent
+                    if (!agentFirstLogMap[r.person_name] || r.entry_date < agentFirstLogMap[r.person_name]) {
+                        agentFirstLogMap[r.person_name] = r.entry_date;
+                    }
                 }
             });
 
@@ -298,13 +365,14 @@
 
             redData.forEach(item => {
                 const dateStr = new Date(item.created_at).toLocaleDateString();
+                const pesoCost = item.points_cost / 10;
                 const trC = document.createElement('tr');
                 trC.className = 'hover:bg-slate-50';
                 trC.innerHTML = `
                     <td class="py-2.5 text-slate-500">${dateStr}</td>
                     <td class="py-2.5 font-medium text-slate-800">${item.person_name}</td>
                     <td class="py-2.5 text-slate-700 font-semibold">${item.reward_item}</td>
-                    <td class="py-2.5 text-center text-purple-700 font-bold">${item.points_cost} Pts</td>
+                    <td class="py-2.5 text-center text-purple-700 font-bold">${item.points_cost} Pts <span class="text-[10px] text-slate-400 block font-normal">(₱${pesoCost.toFixed(2)})</span></td>
                     <td class="py-2.5 text-right font-bold ${item.status === 'Approved' ? 'text-green-600' : item.status === 'Fulfilled' ? 'text-indigo-600' : 'text-amber-600'}">${item.status}</td>
                 `;
                 tbodyClient.appendChild(trC);
