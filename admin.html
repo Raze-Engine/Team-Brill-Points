@@ -22,7 +22,7 @@
                 <h1 class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-lock text-purple-600"></i> Admin Portal
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">Manage agent metrics and review reward redemptions</p>
+                <p class="text-xs text-slate-500 mt-0.5">Manage agent metrics and review reward redemptions (30-Day Policy)</p>
             </div>
             <a href="index.html" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all flex items-center gap-1.5">
                 <i class="fa-solid fa-arrow-left"></i> Back to Client Hub
@@ -73,7 +73,7 @@
 
         <!-- Reward Redemptions Management -->
         <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col gap-4">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Manage Reward Redemptions</h3>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Manage Reward Redemptions (10 Pts = ₱1)</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-slate-700">
                     <thead class="text-slate-400 uppercase font-semibold border-b border-slate-100">
@@ -120,7 +120,6 @@
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Constant Agent List from image
         const CONSTANT_AGENTS = [
             "Calibayan, Jeneth",
             "Pantinople, Mary grace",
@@ -132,7 +131,6 @@
             "Cenabre, Jacque lou"
         ];
 
-        // Populate Admin Form Dropdown
         const adminSelect = document.getElementById('personName');
         CONSTANT_AGENTS.forEach(agent => {
             const opt = document.createElement('option');
@@ -186,12 +184,13 @@
             const tbodyAdmin = document.getElementById('adminRedemptionTableBody');
             tbodyAdmin.innerHTML = '';
             redData.forEach(item => {
+                const pesoCost = item.points_cost / 10;
                 const trA = document.createElement('tr');
                 trA.className = 'hover:bg-slate-50';
                 trA.innerHTML = `
                     <td class="py-2.5 font-medium text-slate-800">${item.person_name}</td>
                     <td class="py-2.5 text-slate-700">${item.reward_item}</td>
-                    <td class="py-2.5 text-center font-semibold">${item.points_cost} Pts</td>
+                    <td class="py-2.5 text-center font-semibold">${item.points_cost} Pts <span class="text-[10px] text-slate-400 block font-normal">(₱${pesoCost.toFixed(2)})</span></td>
                     <td class="py-2.5 text-center font-bold ${item.status === 'Approved' ? 'text-green-600' : item.status === 'Fulfilled' ? 'text-indigo-600' : 'text-amber-600'}">${item.status}</td>
                     <td class="py-2.5 text-right space-x-1">
                         <button onclick="updateRedemptionStatus('${item.id}', 'Approved')" class="px-2 py-1 bg-green-100 text-green-700 rounded text-[10px] font-bold hover:bg-green-200">Approve</button>
